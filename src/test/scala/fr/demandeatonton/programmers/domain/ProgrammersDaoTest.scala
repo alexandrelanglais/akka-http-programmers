@@ -14,30 +14,32 @@ class ProgrammersDaoTest extends FlatSpec with Matchers {
   "A programmers DAO" should "be able to add a Programmer" in {
     val programmer = new Programmer("linus torvalds", "C")
     val inserted = dao.add(programmer)
-    inserted.printResults()
+    val retrieved = inserted.flatMap(p => dao.findByName(programmer.name)).filter(p => p.containsValue(programmer.name))
 
-    inserted.subscribe(new Observer[Completed] {
-      override def onError(e: Throwable): Unit = e.printStackTrace()
+    assert(retrieved.results().head.containsValue(programmer.name))
 
-      override def onComplete(): Unit = {
-        val byname = dao.findByName(programmer.name)
-        byname.printResults()
-        byname.subscribe(new Observer[Document] {
-          override def onError(e: Throwable): Unit = e.printStackTrace()
-
-          override def onComplete(): Unit = println("find completed")
-
-          override def onNext(result: Document): Unit = {
-            println(result)
-            assert(result.contains(programmer.name))
-          }
-        })
-      }
-
-      override def onNext(result: Completed): Unit = {
-        println("on next")
-      }
-    })
+//    inserted.subscribe(new Observer[Completed] {
+//      override def onError(e: Throwable): Unit = e.printStackTrace()
+//
+//      override def onComplete(): Unit = {
+//        val byname = dao.findByName(programmer.name)
+//        byname.printResults()
+//        byname.subscribe(new Observer[Document] {
+//          override def onError(e: Throwable): Unit = e.printStackTrace()
+//
+//          override def onComplete(): Unit = println("find completed")
+//
+//          override def onNext(result: Document): Unit = {
+//            println(result)
+//            assert(result.contains(programmer.name))
+//          }
+//        })
+//      }
+//
+//      override def onNext(result: Completed): Unit = {
+//        println("on next")
+//      }
+//    })
 
   }
 }
